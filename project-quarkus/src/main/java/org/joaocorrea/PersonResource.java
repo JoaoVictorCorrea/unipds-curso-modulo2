@@ -1,5 +1,6 @@
 package org.joaocorrea;
 
+import io.micrometer.core.annotation.Counted;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.DELETE;
@@ -19,6 +20,7 @@ import java.util.List;
 public class PersonResource {
 
     @GET
+    @Counted(value = "counted.getPerson")
     public List<Person> getPerson(){
         return Person.listAll();
     }
