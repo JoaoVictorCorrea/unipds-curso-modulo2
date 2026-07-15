@@ -17,7 +17,10 @@ public class WebSecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(auth -> {
-                auth.requestMatchers(HttpMethod.GET, "/open").permitAll().anyRequest().authenticated();
+                auth.requestMatchers(HttpMethod.GET, "/open").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/users").permitAll()
+                    .requestMatchers(HttpMethod.POST, "/login").permitAll()
+                    .anyRequest().authenticated();
             })
             .addFilterBefore(new AuthFilter(), UsernamePasswordAuthenticationFilter.class);
 
