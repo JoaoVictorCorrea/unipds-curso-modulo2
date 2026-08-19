@@ -1,25 +1,27 @@
 package br.com.dev.ia;
 
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.rag.advisor.RetrievalAugmentationAdvisor;
-import org.springframework.ai.rag.retrieval.search.VectorStoreDocumentRetriever;
-import org.springframework.ai.vectorstore.VectorStore;
+import dev.langchain4j.model.chat.ChatModel;
+import dev.langchain4j.rag.content.retriever.ContentRetriever;
+import dev.langchain4j.service.AiServices;
 import org.springframework.stereotype.Component;
 
 @Component
 public class TravelAgentAssistant {
 
-    private final ChatClient chatClient;
-
-    public TravelAgentAssistant(ChatClient.Builder builder, VectorStore vectorStore){
-        this.chatClient = builder.defaultAdvisors(RetrievalAugmentationAdvisor.builder()
-                                    .documentRetriever(VectorStoreDocumentRetriever.builder()
-                                        .vectorStore(vectorStore).build())
-                                    .build())
-                                 .build();
+    interface Assistant {
+        String chat(String message);
     }
 
-    public String chat(String message){
-        return chatClient.prompt().user(message).call().content();
+    private final Assistant assistant;
+
+    public TravelAgentAssistant(ChatModel chatModel, ContentRetriever contentRetriever) {
+        this.assistant = AiServices.builder(Assistant.class)
+                .chatModel(chatModel)
+                .contentRetriever(contentRetriever)
+                .build();
+    }
+
+    public String chat(String message) {
+        return assistant.chat(message);
     }
 }
