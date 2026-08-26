@@ -1,12 +1,13 @@
-package br.com.dev.ia;
+package br.com.dev.ia.easyrag;
 
 import dev.langchain4j.model.chat.ChatModel;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.service.AiServices;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 @Component
-public class TravelAgentAssistant {
+public class EasyRagAssistant {
 
     interface Assistant {
         String chat(String message);
@@ -14,7 +15,7 @@ public class TravelAgentAssistant {
 
     private final Assistant assistant;
 
-    public TravelAgentAssistant(ChatModel chatModel, ContentRetriever contentRetriever) {
+    public EasyRagAssistant(ChatModel chatModel, @Qualifier("easyRagContentRetriever") ContentRetriever contentRetriever) {
         this.assistant = AiServices.builder(Assistant.class)
                 .chatModel(chatModel)
                 .contentRetriever(contentRetriever)

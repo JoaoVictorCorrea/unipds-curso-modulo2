@@ -47,7 +47,18 @@
 
         <dependency>
             <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- Used by v1 (Easy RAG): provides the DocumentSplitterFactory via SPI -->
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
             <artifactId>langchain4j-easy-rag</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>dev.langchain4j</groupId>
+            <artifactId>langchain4j-pgvector</artifactId>
         </dependency>
 
         <dependency>
