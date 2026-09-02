@@ -8,6 +8,7 @@ import dev.langchain4j.store.embedding.EmbeddingMatch;
 import dev.langchain4j.store.embedding.EmbeddingSearchRequest;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,13 +25,16 @@ public class PgVectorTravelController {
     private final PackageExpert expert;
     private final EmbeddingStore<TextSegment> embeddingStore;
     private final EmbeddingModel embeddingModel;
+    private final double defaultMinScore;
 
     public PgVectorTravelController(PackageExpert expert,
                                     @Qualifier("pgVectorEmbeddingStore") EmbeddingStore<TextSegment> embeddingStore,
+                                    @Value("${rag.retriever.min-score}") double defaultMinScore,
                                     EmbeddingModel embeddingModel) {
         this.expert = expert;
         this.embeddingStore = embeddingStore;
         this.embeddingModel = embeddingModel;
+        this.defaultMinScore = defaultMinScore;
     }
 
     @PostMapping
@@ -39,11 +43,13 @@ public class PgVectorTravelController {
     }
 
     @GetMapping("/debug/embeddings")
-    public List<EmbeddingDebugResult> debugEmbeddings(@RequestParam String query) {
+    public List<EmbeddingDebugResult> debugEmbeddings(@RequestParam String query,
+                                                      @RequestParam(required = false) Double minScore) {
         Embedding queryEmbedding = embeddingModel.embed(query).content();
         EmbeddingSearchRequest request = EmbeddingSearchRequest.builder()
                 .queryEmbedding(queryEmbedding)
                 .maxResults(20)
+                .minScore(minScore != null ? minScore : defaultMinScore)
                 .build();
 
         List<EmbeddingMatch<TextSegment>> matches = embeddingStore.search(request).matches();

@@ -13,6 +13,7 @@ import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
 import dev.langchain4j.store.embedding.pgvector.PgVectorEmbeddingStore;
+import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -65,12 +66,14 @@ public class PgVectorConfig {
 
     @Bean
     public RetrievalAugmentor pgVectorRetrievalAugmentor(@Qualifier("pgVectorEmbeddingStore") EmbeddingStore<TextSegment> embeddingStore,
-                                                          EmbeddingModel embeddingModel) {
+                                                         @Value("${rag.retriever.min-score}") double minScore,
+                                                         EmbeddingModel embeddingModel) {
         return DefaultRetrievalAugmentor.builder()
                 .contentRetriever(EmbeddingStoreContentRetriever.builder()
                         .embeddingStore(embeddingStore)
                         .embeddingModel(embeddingModel)
                         .maxResults(5)
+                        .minScore(minScore)
                         .build())
                 .build();
     }
@@ -79,7 +82,8 @@ public class PgVectorConfig {
     public ChatMemoryProvider chatMemoryProvider() {
         return memoryId -> MessageWindowChatMemory.builder()
                 .id(memoryId)
-                .maxMessages(10)
+                .maxMessages(20)
+                .chatMemoryStore(new InMemoryChatMemoryStore())
                 .build();
     }
 }

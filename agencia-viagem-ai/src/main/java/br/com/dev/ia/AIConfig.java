@@ -21,11 +21,15 @@ public class AIConfig {
     @Bean
     public ChatModel chatModel(@Value("${langchain4j.ollama.base-url}") String baseUrl,
                                @Value("${langchain4j.ollama.chat-model}") String modelName,
-                               @Value("${langchain4j.ollama.timeout-seconds}") long timeoutSeconds) {
+                               @Value("${langchain4j.ollama.timeout-seconds}") long timeoutSeconds,
+                               @Value("${langchain4j-log-requests}") boolean logRequests,
+                               @Value("${langchain4j-log-responses}") boolean logResponses) {
         return OllamaChatModel.builder()
                 .baseUrl(baseUrl)
                 .modelName(modelName)
                 .timeout(Duration.ofSeconds(timeoutSeconds))
+                .logRequests(logRequests)
+                .logResponses(logResponses)
                 .build();
     }
 
