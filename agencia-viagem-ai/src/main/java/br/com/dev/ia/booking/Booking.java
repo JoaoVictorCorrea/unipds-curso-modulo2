@@ -8,5 +8,6 @@ public record Booking(
         String destination,
         LocalDate startDate,
         LocalDate endData,
-        BookingStatus status
+        BookingStatus status,
+        Category category
 ) {}

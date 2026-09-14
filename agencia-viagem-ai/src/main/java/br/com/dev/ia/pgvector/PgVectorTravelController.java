@@ -1,6 +1,7 @@
 package br.com.dev.ia.pgvector;
 
 import br.com.dev.ia.EmbeddingDebugResult;
+import br.com.dev.ia.booking.SecurityContext;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -38,8 +40,17 @@ public class PgVectorTravelController {
     }
 
     @PostMapping
-    public String ask(@RequestBody String question) {
-        return expert.chat("session-123", question);
+    public String ask(@RequestBody String question, @RequestHeader("X-User-Name") String userName) {
+        if(userName != null && !userName.isEmpty()){
+            try{
+                SecurityContext.setCurrentUser(userName);
+                return expert.chat(userName, question);
+            } finally {
+                SecurityContext.clear();
+            }
+        } else {
+            return "Usuário precisa estar autenticado!";
+        }
     }
 
     @GetMapping("/debug/embeddings")
