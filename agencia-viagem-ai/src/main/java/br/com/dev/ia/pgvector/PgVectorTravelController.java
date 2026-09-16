@@ -1,7 +1,6 @@
 package br.com.dev.ia.pgvector;
 
 import br.com.dev.ia.EmbeddingDebugResult;
-import br.com.dev.ia.booking.SecurityContext;
 import dev.langchain4j.data.embedding.Embedding;
 import dev.langchain4j.data.segment.TextSegment;
 import dev.langchain4j.model.embedding.EmbeddingModel;
@@ -24,12 +23,12 @@ import java.util.List;
 @RequestMapping("/travel/pg-vector")
 public class PgVectorTravelController {
 
-    private final PackageExpert expert;
+    private final PackageExpertWithTemplate expert;
     private final EmbeddingStore<TextSegment> embeddingStore;
     private final EmbeddingModel embeddingModel;
     private final double defaultMinScore;
 
-    public PgVectorTravelController(PackageExpert expert,
+    public PgVectorTravelController(PackageExpertWithTemplate expert,
                                     @Qualifier("pgVectorEmbeddingStore") EmbeddingStore<TextSegment> embeddingStore,
                                     @Value("${rag.retriever.min-score}") double defaultMinScore,
                                     EmbeddingModel embeddingModel) {
@@ -42,12 +41,7 @@ public class PgVectorTravelController {
     @PostMapping
     public String ask(@RequestBody String question, @RequestHeader("X-User-Name") String userName) {
         if(userName != null && !userName.isEmpty()){
-            try{
-                SecurityContext.setCurrentUser(userName);
-                return expert.chat(userName, question);
-            } finally {
-                SecurityContext.clear();
-            }
+            return expert.chat(userName, question, userName);
         } else {
             return "Usuário precisa estar autenticado!";
         }

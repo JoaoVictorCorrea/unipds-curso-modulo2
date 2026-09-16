@@ -3,6 +3,7 @@ package br.com.dev.ia.pgvector;
 import dev.langchain4j.service.MemoryId;
 import dev.langchain4j.service.SystemMessage;
 import dev.langchain4j.service.UserMessage;
+import dev.langchain4j.service.V;
 import dev.langchain4j.service.spring.AiService;
 import dev.langchain4j.service.spring.AiServiceWiringMode;
 
@@ -13,7 +14,7 @@ import dev.langchain4j.service.spring.AiServiceWiringMode;
         chatMemoryProvider = "chatMemoryProvider",
         toolProvider = "bookingMcpToolProvider"
 )
-public interface PackageExpert {
+public interface PackageExpertWithTemplate {
 
     @SystemMessage("""
             Você é um assistente virtual da 'Mundo Viagens', um especialista em nossos pacotes de viagem e reservas.
@@ -25,5 +26,6 @@ public interface PackageExpert {
             você deve responder educamente:
             'Desculpe, mas não tenho informações sobre isso. Posso ajudar com mais alguma dúvida sobre nossos pacotes?'
             """)
-    String chat(@MemoryId String memoryId, @UserMessage String userMessage);
+    @UserMessage("Do what user is asking {{message}}. The user used for authentication is {{username}}.")
+    String chat(@MemoryId String memoryId, @V("message") String message, @V("username") String username);
 }
